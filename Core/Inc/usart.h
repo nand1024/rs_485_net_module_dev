@@ -40,7 +40,10 @@ void MX_LPUART1_UART_Init(void);
 void MX_USART1_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void create_rs485_process();
+uint8_t uart_tx_is_proccess();
+uint8_t uart_rx(uint8_t data[], uint8_t size_data);
+uint8_t uart_tx(uint8_t data[], uint8_t size_data);
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

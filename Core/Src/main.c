@@ -22,7 +22,7 @@
 #include "dma.h"
 #include "usart.h"
 #include "gpio.h"
-
+#include "../RS485_module/rs485_user.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
