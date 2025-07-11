@@ -10,11 +10,11 @@
 #include "rs485_net.h"
 #include "rs485_net_port.h"
 
+static uint8_t buffer[RS485_BUFFER_SIZE] = {0};
 
 static const uint8_t start_byte_m = '!';
 static const uint8_t start_byte_s = '$';
 static const uint8_t end_byte = '\n';
-
 
 uint8_t crc8(uint8_t data, uint8_t crc)
 {
@@ -107,7 +107,7 @@ rs485_ret_type rs485_data_serialize(uint8_t tx_bytes[], uint8_t size_tx, rs485_p
 {
 	uint8_t control_crc = 0;
 
-	if (size_tx < packet->data_size + 5) {
+	if (size_tx < packet->data_size + RS_485_FIELDS_SIZE) {
 		return rs485_error;
 	}
 
@@ -135,14 +135,21 @@ rs485_ret_type rs485_data_serialize(uint8_t tx_bytes[], uint8_t size_tx, rs485_p
 	return rs485_succes;
 }
 
-rs485_ret_type rs485_request_master_prc (rs485_pack_type *message_send, rs485_pack_type *message_get)
+
+
+rs485_ret_type rs485_send_message(rs485_pack_type *message)
 {
-return rs485_succes;
+	rs485_ret_type res;
+	rs485_port_switch_trancieve();
+	res = rs485_data_serialize(buffer, sizeof(buffer), message);
+	if (res == rs485_succes) {
+		rs485_port_uart_tx(buffer, message->data_size + RS_485_FIELDS_SIZE);
+	}
+	return res;
 }
 
-rs485_ret_type rs485_request_slave_prc (rs485_pack_type *message_send, rs485_pack_type *message_get)
+rs485_ret_type rs485_get_message(rs485_pack_type *message)
 {
-	uint8_t buffer[128] = {0};
 	uint8_t rx_size = 0;
 	rs485_ret_type res;
 	if (rs485_tx_is_proccess() == 0) {
@@ -151,21 +158,7 @@ rs485_ret_type rs485_request_slave_prc (rs485_pack_type *message_send, rs485_pac
 		return rs485_in_proccesse;
 	}
 	rx_size = rs485_port_uart_rx(buffer, sizeof(buffer));
-	res = rs485_data_deserialize(buffer, rx_size, message_get);
-	if (res == rs485_succes) {
-		//for test
-		message_send->adress = message_get->adress;
-		for (uint8_t x = 0; x < message_get->data_size; x++) {
-			*((uint8_t *)message_send->data + x) = *((uint8_t *)message_get->data + x);
-		}
-		message_send->data_size = message_get->data_size;
-		message_send->index_data = 0;
-
-		rs485_port_switch_trancieve();
-		res = rs485_data_serialize(buffer, sizeof(buffer), message_send);
-		if (res == rs485_succes) {
-			rs485_port_uart_tx(buffer, message_send->data_size + 5);
-		}
-	}
+	res = rs485_data_deserialize(buffer, rx_size, message);
 	return res;
 }
+

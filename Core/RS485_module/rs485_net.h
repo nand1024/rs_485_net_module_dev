@@ -10,12 +10,18 @@
 
 #include <stdint.h>
 
+#define RS_485_PAYLOAD_SIZE     32
+#define RS_485_FIELDS_SIZE		5//(start byte) + (adress) + (size data) + (crc) + (end byte)
+#define RS_485_TX_BUFFER_SIZE   (RS_485_PAYLOAD_SIZE + RS_485_FIELDS_SIZE)
+#define RS_485_RX_BUFFER_SIZE   (RS_485_TX_BUFFER_SIZE * 2)
+#define RS485_BUFFER_SIZE       RS_485_RX_BUFFER_SIZE
+
+
 typedef enum {
 	rs485_in_proccesse,
 	rs485_succes,
 	rs485_error,
 }rs485_ret_type;
-
 
 typedef enum {
 	rs485_wait_start,
@@ -25,6 +31,7 @@ typedef enum {
 	rs485_recieve_crc,
 	rs485_recieve_end,
 } rs485_stage_rx;
+
 
 typedef struct {
 	uint8_t adress;
@@ -39,8 +46,9 @@ rs485_ret_type rs485_data_deserialize (uint8_t rx_bytes[], uint8_t size_rx, rs48
 
 rs485_ret_type rs485_data_serialize(uint8_t tx_bytes[], uint8_t size_tx, rs485_pack_type *packet);
 
-rs485_ret_type rs485_request_master_prc (rs485_pack_type *message_send, rs485_pack_type *message_get);
+rs485_ret_type rs485_get_message(rs485_pack_type *message);
 
-rs485_ret_type rs485_request_slave_prc (rs485_pack_type *message_send, rs485_pack_type *message_get);
+rs485_ret_type rs485_send_message(rs485_pack_type *message);
+
 
 #endif /* RS485_MODULE_RS485_NET_H_ */

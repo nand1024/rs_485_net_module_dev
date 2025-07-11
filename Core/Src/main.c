@@ -22,6 +22,7 @@
 #include "dma.h"
 #include "usart.h"
 #include "gpio.h"
+#include "led.h"
 #include "../RS485_module/rs485_user.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -109,6 +110,7 @@ int main(void)
   /* Call init function for freertos objects (in cmsis_os2.c) */
   MX_FREERTOS_Init();
   create_rs485_process();
+  create_led_process();
   /* Start scheduler */
   osKernelStart();
 

@@ -7,6 +7,8 @@
 
 #include <usart.h>
 
+
+
 void rs485_port_switch_trancieve()
 {
 	LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_12);
